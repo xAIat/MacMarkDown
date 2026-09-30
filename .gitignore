@@ -1,0 +1,23 @@
+# 系统
+.DS_Store
+
+# 构建产物
+build/
+.build/
+.swiftpm/
+DerivedData/
+.derived/
+
+# Xcode 本地用户数据
+xcuserdata/
+*.xcuserstate
+
+# opencode 个人本地配置（含本机模型与端口，不入库）
+opencode.jsonc
+Opencode/
+# 编译器中间产物（防误提交）
+*.o
+*.d
+*.dia
+*.swiftdeps
+*.swiftconstvalues

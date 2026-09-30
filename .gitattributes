@@ -1,0 +1,3 @@
+# Third-party rendering engines are shipped as minified app resources.
+# Keep them out of language statistics and collapse them in diffs.
+MacMarkDown/Resources/Extensions/*.js linguist-vendored -diff

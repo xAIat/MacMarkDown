@@ -1,0 +1,179 @@
+# XcodeGen spec — generates MacMarkDown.xcodeproj (single Xcode project, no Package.swift)
+# Regenerate with: xcodegen generate
+name: MacMarkDown
+options:
+  bundleIdPrefix: com.xaiat
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  xcodeVersion: "27.0"
+
+packages:
+  swift-markdown:
+    url: https://github.com/apple/swift-markdown.git
+    from: 0.6.0
+  Yams:
+    url: https://github.com/jpsim/Yams.git
+    from: 5.0.0
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+
+targets:
+  MacMarkDownKit:
+    type: framework
+    platform: macOS
+    sources:
+      - path: MacMarkDown
+        excludes:
+          - "Tests/**"
+          - "Application/**"
+          - "Info.plist"
+          - "Resources/**"
+      - path: MacMarkDown/Resources
+        buildPhase: resources
+    dependencies:
+      - package: swift-markdown
+        product: Markdown
+      - package: Yams
+        product: Yams
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xaiat.MacMarkDownKit
+        PRODUCT_NAME: MacMarkDownKit
+        GENERATE_INFOPLIST_FILE: YES
+        DEFINES_MODULE: YES
+        SKIP_INSTALL: YES
+        CODE_SIGN_IDENTITY: Apple Development
+        "CODE_SIGN_IDENTITY[sdk=macosx*]": Apple Development
+        CODE_SIGN_STYLE: Automatic
+        PROVISIONING_PROFILE_SPECIFIER: ""
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/../Frameworks"
+          - "@loader_path/Frameworks"
+      configs:
+        Debug:
+          ENABLE_TESTABILITY: YES
+
+  MacMarkDown:
+    type: application
+    platform: macOS
+    sources:
+      - path: MacMarkDown/Application
+      - path: Resources/AppIcon.icns
+        buildPhase: resources
+      - path: Resources/Localizable.xcstrings
+        buildPhase: resources
+      - path: Resources/MacMarkDown.sdef
+        buildPhase: resources
+      - path: Resources/help.md
+        buildPhase: resources
+      - path: Resources/contribute.md
+        buildPhase: resources
+    dependencies:
+      - target: MacMarkDownKit
+        embed: true
+        codeSign: true
+      - target: MacMarkDownCLI
+        copy:
+          destination: executables
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xaiat.MacMarkDown
+        PRODUCT_NAME: MacMarkDown
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
+        CODE_SIGN_IDENTITY: Apple Development
+        CODE_SIGN_STYLE: Automatic
+        PROVISIONING_PROFILE_SPECIFIER: ""
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/../Frameworks"
+    info:
+      path: MacMarkDown/Info.plist
+      properties:
+        CFBundleDisplayName: MacMarkDown
+        CFBundleDocumentTypes:
+          - CFBundleTypeExtensions:
+              - md
+              - markdown
+              - mdown
+              - mkd
+              - mkdn
+            CFBundleTypeName: Markdown Document
+            CFBundleTypeRole: Editor
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - net.daringfireball.markdown
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundleIconFile: AppIcon
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleInfoDictionaryVersion: "6.0"
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: APPL
+        CFBundleURLTypes:
+          - CFBundleURLName: com.xaiat.MacMarkDown.url
+            CFBundleURLSchemes:
+              - x-macmarkdown
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        NSHighResolutionCapable: true
+        NSPrincipalClass: NSApplication
+        NSAppleScriptEnabled: true
+        OSAScriptingDefinition: MacMarkDown.sdef
+        NSSupportsAutomaticGraphicsSwitching: true
+        # Sparkle placeholder configuration. Replace the feed URL and add the
+        # EdDSA public key before enabling the updater.
+        SUFeedURL: "https://example.com/macmarkdown/appcast.xml"
+        SUPublicEDKey: "PLACEHOLDER_EDDSA_PUBLIC_KEY"
+        SUEnableAutomaticChecks: false
+
+  MacMarkDownCLI:
+    type: tool
+    platform: macOS
+    sources:
+      - path: CLI
+    settings:
+      base:
+        PRODUCT_NAME: macmarkdown-cli
+        PRODUCT_BUNDLE_IDENTIFIER: com.xaiat.MacMarkDown.cli
+        CODE_SIGN_IDENTITY: "-"
+        SKIP_INSTALL: YES
+        SWIFT_ENABLE_EXPLICIT_MODULES: NO
+        CLANG_ENABLE_EXPLICIT_MODULES: NO
+
+  MacMarkDownTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: MacMarkDown/Tests
+    dependencies:
+      - target: MacMarkDownKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xaiat.MacMarkDownTests
+        GENERATE_INFOPLIST_FILE: YES
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/../Frameworks"
+          - "@loader_path/../Frameworks"
+          - "$(BUILT_PRODUCTS_DIR)"
+
+schemes:
+  MacMarkDown:
+    build:
+      targets:
+        MacMarkDown: all
+        MacMarkDownKit: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - MacMarkDownTests
+    archive:
+      config: Release

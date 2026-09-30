@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dictionary SYSTEM "file://localhost/System/Library/DTDs/sdef.dtd">
+
+<!--
+  MacMarkDown scripting definition.
+  Exposes the standard suite plus a document class whose `text` (read/write)
+  and `html` (read-only) properties are bridged to the focused document via
+  ScriptableDocument (see ScriptableDocument.swift).
+-->
+<dictionary title="MacMarkDown Terminology">
+    <suite name="Standard Suite" code="core" description="Common classes and commands for most applications.">
+        <class name="application" code="capp" description="The application program.">
+            <cocoa class="NSApplication"/>
+            <element type="document" access="r">
+                <cocoa key="documents"/>
+            </element>
+        </class>
+        <class name="document" code="docu" description="A Markdown document.">
+            <cocoa class="ScriptableDocument"/>
+            <property name="name" code="pnam" type="text" access="r" description="The document's name.">
+                <cocoa key="name"/>
+            </property>
+            <property name="modified" code="imod" type="boolean" access="r" description="Whether the document has unsaved changes.">
+                <cocoa key="modified"/>
+            </property>
+            <property name="file" code="file" type="text" access="r" description="The document's file path, if any.">
+                <cocoa key="file"/>
+            </property>
+        </class>
+        <command name="count" code="cntc" description="Count the number of objects of a class.">
+            <direct-parameter type="type" description="The class of objects to count."/>
+            <result type="integer" description="The number of objects."/>
+        </command>
+    </suite>
+    <suite name="MacMarkDown Suite" code="MMDS" description="MacMarkDown-specific document properties.">
+        <class name="document" code="docu" description="A Markdown document.">
+            <cocoa class="ScriptableDocument"/>
+            <property name="text" code="MMTX" type="text" access="rw" description="The Markdown source text.">
+                <cocoa key="text"/>
+            </property>
+            <property name="html" code="MMHT" type="text" access="r" description="The rendered HTML.">
+                <cocoa key="html"/>
+            </property>
+        </class>
+    </suite>
+</dictionary>
